@@ -4,12 +4,12 @@ const path = require('path');
 const qrcode = require('qrcode');
 const fs = require('fs');
 
-const WhatsAppBot = require('./index');
+const WhatsAppBot = require('./index'); // make sure you have index.js for bot logic
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const bot = new WhatsAppBot();
@@ -22,18 +22,19 @@ bot.on('qr', (qr) => {
     console.log('QR code updated');
 });
 
-bot.on('connection', ({status}) => {
+bot.on('connection', ({ status }) => {
     connectionStatus = status;
     if (status === 'open') {
-        console.log('WhatsApp bot connected!');
-        latestQrString = null; // Clear QR after connected
+        console.log('✅ WhatsApp bot connected!');
+        latestQrString = null;
     } else if (status === 'close') {
-        console.log('WhatsApp bot disconnected!');
+        console.log('❌ WhatsApp bot disconnected!');
     }
 });
 
 // Start WhatsApp bot
 bot.start();
+
 app.get('/', async (req, res) => {
     let qrImage = null;
     if (latestQrString) {
@@ -46,11 +47,10 @@ app.get('/', async (req, res) => {
             return;
         }
 
-        // Inject QR image and status dynamically
         const htmlWithStatus = data
             .replace('{{STATUS}}', connectionStatus)
             .replace('{{QR_IMAGE}}', qrImage
-                ? `<img src="${qrImage}" alt="QR Code" />`
+                ? <img src="${qrImage}" alt="QR Code" />
                 : '<p>QR code scanned or not available.</p>');
 
         res.send(htmlWithStatus);
@@ -58,17 +58,17 @@ app.get('/', async (req, res) => {
 });
 
 app.post('/send-message', async (req, res) => {
-    const {phone, message} = req.body;
+    const { phone, message } = req.body;
 
     try {
         await bot.sendMessage(phone, message);
-        res.send(`<p>✅ Message sent to ${phone}</p><a href="/">Back</a>`);
+        res.send(<p>✅ Message sent to ${phone}</p><a href="/">Back</a>);
     } catch (error) {
         console.error(error);
-        res.status(500).send(`<p>❌ Failed to send message: ${error.message}</p><a href="/">Back</a>`);
+        res.status(500).send(<p>❌ Failed to send message: ${error.message}</p><a href="/">Back</a>);
     }
 });
 
 app.listen(PORT, () => {
-    console.log(`Server started on http://localhost:${PORT}`);
+    console.log(🚀 Server started on http://localhost:${PORT});
 });
