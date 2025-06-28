@@ -4,7 +4,7 @@ const path = require('path');
 const qrcode = require('qrcode');
 const fs = require('fs');
 
-const WhatsAppBot = require('./index'); // make sure you have index.js for bot logic
+const WhatsAppBot = require('./index'); // Your bot logic
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,7 +32,7 @@ bot.on('connection', ({ status }) => {
     }
 });
 
-// Start WhatsApp bot
+// Start the WhatsApp bot
 bot.start();
 
 app.get('/', async (req, res) => {
@@ -50,7 +50,7 @@ app.get('/', async (req, res) => {
         const htmlWithStatus = data
             .replace('{{STATUS}}', connectionStatus)
             .replace('{{QR_IMAGE}}', qrImage
-                ? <img src="${qrImage}" alt="QR Code" />
+                ? `<img src="${qrImage}" alt="QR Code" />`
                 : '<p>QR code scanned or not available.</p>');
 
         res.send(htmlWithStatus);
@@ -62,13 +62,13 @@ app.post('/send-message', async (req, res) => {
 
     try {
         await bot.sendMessage(phone, message);
-        res.send(<p>✅ Message sent to ${phone}</p><a href="/">Back</a>);
+        res.send(`<p>✅ Message sent to ${phone}</p><a href="/">Back</a>`);
     } catch (error) {
         console.error(error);
-        res.status(500).send(<p>❌ Failed to send message: ${error.message}</p><a href="/">Back</a>);
+        res.status(500).send(`<p>❌ Failed to send message: ${error.message}</p><a href="/">Back</a>`);
     }
 });
 
 app.listen(PORT, () => {
-    console.log(🚀 Server started on http://localhost:${PORT});
+    console.log(`🚀 Server started on http://localhost:${PORT}`);
 });
